@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Earthquake Disaster App - Login</title>
+  <link rel="stylesheet" href="styleSheet.css">
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-box">
+      <img src="https://cdn-icons-png.flaticon.com/512/564/564619.png" alt="App Logo" class="app-logo">
+      <h2 class="app-title">Earthquake Disaster App</h2>
+      <p class="subtitle">Emergency Response System</p>
+
+      <form>
+        <label for="token">First Responder Token</label>
+        <input type="text" id="token" placeholder="First Responder Token" required class="error">
+
+        <label for="email">Email Address</label>
+        <input type="email" id="email" placeholder="user@email.com" required>
+
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter your password" required>
+
+        <div class="options">
+          <label><input type="checkbox"> Remember me</label>
+          <a href="#" class="forgot">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn-signin">Sign In</button>
+        <button type="button" class="btn-sos">⚠ Continue without login (SOS)</button>
+      </form>
+
+      <p class="footer-text">
+        Need access? <a href="#" class="admin-link">Contact Administrator</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,144 @@
+/* Reset margins/paddings */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+/* Center page vertically & horizontally */
+body {
+  background: linear-gradient(180deg, #f8f9fc, #e8ecf4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+/* Outer box */
+.login-container {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+  width: 380px;
+  padding: 40px 35px;
+}
+
+/* Logo */
+.app-logo {
+  display: block;
+  margin: 0 auto 15px;
+  width: 60px;
+}
+
+/* App title and subtitle */
+.app-title {
+  text-align: center;
+  color: #c05a00;
+  font-size: 1.2rem;
+  margin-bottom: 3px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin-bottom: 25px;
+}
+
+/* Labels and inputs */
+label {
+  font-size: 0.9rem;
+  color: #444;
+  display: block;
+  margin-top: 12px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  width: 100%;
+  padding: 10px 12px;
+  margin-top: 6px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+input:focus {
+  border-color: #2563eb;
+}
+
+input.error {
+  border-color: #ef4444;
+}
+
+/* Remember/Forgot row */
+.options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  font-size: 0.9rem;
+}
+
+.options .forgot {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.options .forgot:hover {
+  text-decoration: underline;
+}
+
+/* Buttons */
+.btn-signin {
+  width: 100%;
+  background: linear-gradient(to right, #007bff, #028a70);
+  border: none;
+  color: #fff;
+  padding: 10px 0;
+  border-radius: 6px;
+  margin-top: 20px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-signin:hover {
+  opacity: 0.95;
+}
+
+.btn-sos {
+  width: 100%;
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  padding: 10px 0;
+  border-radius: 6px;
+  margin-top: 12px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-sos:hover {
+  opacity: 0.9;
+}
+
+/* Footer link */
+.footer-text {
+  text-align: center;
+  font-size: 0.9rem;
+  margin-top: 25px;
+  color: #555;
+}
+
+.footer-text .admin-link {
+  color: #15803d;
+  text-decoration: none;
+}
+
+.footer-text .admin-link:hover {
+  text-decoration: underline;
+}
