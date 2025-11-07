@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>First Responder Dashboard</title>
+  <link rel="stylesheet" href="firstRespDash.css" />
+</head>
+<body>
+  
+  <header class="navbar">
+    <div class="navbar-left">
+      <img src="https://cdn-icons-png.flaticon.com/512/564/564619.png" alt="Logo" class="logo">
+      <div class="app-info">
+        <h1>Earthquake Disaster App</h1>
+        <p>First Responder Account: FR-2847</p>
+      </div>
+    </div>
+    <button class="logout-btn">Logout</button>
+  </header>
+
+  <main class="main-content">
+    <section class="left-panel">
+      <div class="map-card">
+        <h2>Affected Areas</h2>
+        <div class="map-container">
+          <div id="map">
+            <div class="incident-tag">6 Active Incidents</div>
+            <img src="https://i.imgur.com/9V0pYvN.png" alt="Map placeholder">
+          </div>
+        </div>
+      </div>
+
+      <div class="updates-card">
+        <h2>Real-time Updates</h2>
+        <ul class="updates-list">
+          <li class="update-item red">
+            <span>Downtown Vancouver affected - Structural damage reported</span>
+            <span class="time">2 min ago</span>
+            <span class="badge live">Live</span>
+          </li>
+          <li class="update-item yellow">
+            <span>150 estimated injuries</span>
+            <span class="time">5 min ago</span>
+          </li>
+          <li class="update-item yellow">
+            <span>Kitsilano affected - Gas leak detected on 4th Avenue</span>
+            <span class="time">8 min ago</span>
+          </li>
+          <li class="update-item red">
+            <span>3 buildings collapsed in Gastown area</span>
+            <span class="time">12 min ago</span>
+          </li>
+          <li class="update-item blue">
+            <span>Yaletown affected - Power outage in progress</span>
+            <span class="time">15 min ago</span>
+          </li>
+          <li class="update-item yellow">
+            <span>75 estimated injuries in Chinatown district</span>
+            <span class="time">18 min ago</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <aside class="right-panel">
+      <h2>Quick Actions</h2>
+      <button class="action-btn report">Report Incident</button>
+      <button class="action-btn resources">Request Resources</button>
+      <button class="action-btn emergency">Emergency Alert</button>
+    </aside>
+  </main>
+</body>
+</html>
