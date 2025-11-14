@@ -1,0 +1,17 @@
+# Ignore build and temporary files
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.dll
+*.exe
+
+# Ignore publish outputs
+publish/
+*.Publish.xml
+*.publishsettings
+
+# Ignore other unnecessary files
+Thumbs.db
+*.log

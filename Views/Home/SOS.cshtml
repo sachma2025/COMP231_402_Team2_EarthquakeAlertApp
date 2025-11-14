@@ -1,0 +1,64 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Send Distress Signal</title>
+    <link rel="stylesheet" href="~/css/SOS.css" />
+</head>
+<body>
+    <h2>Send Distress Signal</h2>
+
+    <textarea id="details" placeholder="Optional details: injury severity, number of people, etc."></textarea>
+    <br>
+    <button class="sos-btn" onclick="sendSOS()">Send SOS</button>
+    <p class="status" id="status"></p>
+
+    <script>
+        async function sendSOS() {
+            const statusEl = document.getElementById("status");
+            statusEl.textContent = "Sending distress signal...";
+
+            if (!navigator.geolocation) {
+                statusEl.textContent = "Geolocation is not supported by your browser.";
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(success, error);
+
+            async function success(position) {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+                const details = document.getElementById("details").value;
+
+                const payload = { latitude, longitude, details };
+
+                try {
+                    const response = await fetch('/Home/SendSOS', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.ok) {
+                        statusEl.textContent = "Distress signal sent successfully!";
+                        document.querySelector(".sos-btn").disabled = true;
+                    } else {
+                        statusEl.textContent = "Failed to send SOS.";
+                    }
+                } catch (err) {
+                    console.error(err);
+                    statusEl.textContent = "Network error while sending SOS.";
+                }
+            }
+
+            function error() {
+                statusEl.textContent = "Unable to retrieve your location.";
+            }
+        }
+    </script>
+</body>
+</html>

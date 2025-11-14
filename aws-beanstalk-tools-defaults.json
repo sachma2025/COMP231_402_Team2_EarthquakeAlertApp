@@ -1,0 +1,20 @@
+
+{
+    "region" : "us-east-1",
+    "configuration" : "Release",
+    "framework"     : "net8.0",
+    "self-contained" : true,
+    "application"    : "Team2EarthquakeAlertApp",
+    "environment"    : "earthquakeapp-env",
+    "enable-xray"    : false,
+    "enhanced-health-type" : "basic",
+    "additional-options"   : "\"aws:autoscaling:launchconfiguration,SecurityGroups\"=\"sg-00037a92fc1ec25b9\";\"aws:ec2:vpc,Subnets\"=\"subnet-00dfa58bc0f231fb7\"",
+    "solution-stack"       : "64bit Amazon Linux 2 v2.11.8 running .NET Core",
+    "environment-type"     : "SingleInstance",
+    "cname"                : "earthquakeapp",
+    "instance-type"        : "t3a.micro",
+    "key-pair"             : "keypair-4-comp306-402",
+    "instance-profile"     : "aws-elasticbeanstalk-ec2-role",
+    "service-role"         : "aws-elasticbeanstalk-service-role",
+    "proxy-server"         : "nginx"
+}

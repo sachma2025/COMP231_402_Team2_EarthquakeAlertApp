@@ -1,0 +1,144 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>First Responder Dashboard</title>
+    <link rel="stylesheet" href="~/css/firstRespDashboard.css" />
+</head>
+<body>
+    <header class="navbar">
+        <div class="navbar-left">
+            <img src="https://cdn-icons-png.flaticon.com/512/564/564619.png" alt="Logo" class="logo">
+            <div class="app-info">
+                <h1>Earthquake Disaster App</h1>
+                <p>First Responder Account: FR-2847</p>
+            </div>
+        </div>
+        <button class="logout-btn">Logout</button>
+    </header>
+
+    <main class="main-content">
+        <section class="left-panel">
+            <!-- Google Map Section -->
+            <div class="map-card">
+                <h2>Affected Areas</h2>
+                <div class="map-container">
+                    <div id="map" style="width:100%; height:350px; border-radius:10px;"></div>
+                </div>
+            </div>
+
+            <!-- Real-time Updates -->
+            <div class="updates-card">
+                <div class="updates-header">
+                    <h2>Real-time Updates</h2>
+                    <span class="badge live">Live</span>
+                </div>
+                <ul class="updates-list">
+                    <li class="update-item red">
+                        <span>Downtown Vancouver affected - Structural damage reported</span>
+                        <span class="time">2 min ago</span>
+                    </li>
+                    <li class="update-item yellow">
+                        <span>150 estimated injuries</span>
+                        <span class="time">5 min ago</span>
+                    </li>
+                    <li class="update-item yellow">
+                        <span>Kitsilano affected - Gas leak detected on 4th Avenue</span>
+                        <span class="time">8 min ago</span>
+                    </li>
+                    <li class="update-item red">
+                        <span>3 buildings collapsed in Gastown area</span>
+                        <span class="time">12 min ago</span>
+                    </li>
+                    <li class="update-item blue">
+                        <span>Yaletown affected - Power outage in progress</span>
+                        <span class="time">15 min ago</span>
+                    </li>
+                    <li class="update-item yellow">
+                        <span>75 estimated injuries in Chinatown district</span>
+                        <span class="time">18 min ago</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Quick Actions Panel-->
+        <aside class="right-panel">
+            <h2>Quick Actions</h2>
+            <button class="action-btn report">Report Incident</button>
+            <button class="action-btn resources">Request Resources</button>
+            <button class="action-btn emergency">Emergency Alert</button>
+        </aside>
+    </main>
+
+    <!-- Google Maps API Script -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
+
+    <!-- Google Maps + Live Update Scripts -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
+    <script>
+        // Run only after the entire page (including map div) has loaded
+        window.addEventListener("load", () => {
+            //Initialize Google Map
+            const center = { lat: 49.2827, lng: -123.1207 }; // Vancouver
+            const map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 11,
+                center: center,
+            });
+
+            const locations = [
+                { lat: 49.283, lng: -123.115, title: "Downtown Incident" },
+                { lat: 49.263, lng: -123.138, title: "Kitsilano Damage" },
+                { lat: 49.270, lng: -123.100, title: "Gastown Collapse" }
+            ];
+
+            locations.forEach(p =>
+                new google.maps.Marker({
+                    position: { lat: p.lat, lng: p.lng },
+                    map: map,
+                    title: p.title,
+                    icon: "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
+                })
+            );
+
+            // --- Real-time Updates Simulation ---
+                    let lastColor = null;
+
+        function addRandomUpdate() {
+            const responses = [
+                "Aftershock detected near downtown area.",
+                "Emergency crews dispatched to collapsed building.",
+                "Gas leak reported in East Vancouver.",
+                "Bridge inspection underway after tremor.",
+                "Power outage reported in Kitsilano district."
+            ];
+
+            const colors = ["red", "yellow", "blue"];
+            const message = responses[Math.floor(Math.random() * responses.length)];
+            const time = new Date().toLocaleTimeString();
+
+            // pick a color different from the last one
+            let color;
+            do {
+                color = colors[Math.floor(Math.random() * colors.length)];
+            } while (color === lastColor);
+            lastColor = color;
+
+            const list = document.querySelector(".updates-list");
+            if (!list) return;
+
+            const li = document.createElement("li");
+            li.className = `update-item ${color}`;
+            li.innerHTML = `<span>${message}</span><span class="time">${time}</span>`;
+            list.prepend(li);
+        }
+            // Add one new update every 10 seconds
+            setInterval(addRandomUpdate, 10000);
+        });
+    </script>
+</body>
+</html>
