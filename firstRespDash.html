@@ -16,7 +16,9 @@
         <p>First Responder Account: FR-2847</p>
       </div>
     </div>
-    <button class="logout-btn">Logout</button>
+    <form asp-controller="Home" asp-action="Logout" method="post">
+      <button type="submit" class="logout-btn">Logout</button>
+    </form>
   </header>
 
   <main class="main-content">
@@ -33,7 +35,7 @@
 
       <div class="updates-card">
         <h2>Real-time Updates</h2>
-        <ul class="updates-list">
+        <ul class="updates-list" style="max-height: 300px; overflow-y: auto;">
           <li class="update-item red">
             <span>Downtown Vancouver affected - Structural damage reported</span>
             <span class="time">2 min ago</span>

@@ -75,6 +75,13 @@ namespace Team2_EarthquakeAlertApp.Controllers
             return Ok();
         }
 
+        [HttpPost]
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();          
+            return RedirectToAction("Login");     
+        }
+        
         [HttpGet]
         public JsonResult GetNewMessage()
         {
