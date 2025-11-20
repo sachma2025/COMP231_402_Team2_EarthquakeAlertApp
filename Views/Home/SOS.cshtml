@@ -12,7 +12,16 @@
 <body>
     <h2>Send Distress Signal</h2>
 
-    <textarea id="details" placeholder="Optional details: injury severity, number of people, etc."></textarea>
+    <form id="sosForm" class="sos-form">
+        <label for="people">No. of People Affected:</label>
+        <input type="number" id="people" name="people" min="1" value="1" required>
+
+        <label for="problem">Problem/Situation:</label>
+        <input type="text" id="problem" name="problem" placeholder="e.g., Trapped, Injured, Fire" required>
+
+        <label for="message">Detailed Message (Optional):</label>
+        <textarea id="message" name="message" placeholder="Injury severity, specific location details, supplies needed, etc."></textarea>
+    </form>
     <br>
     <button class="sos-btn" onclick="sendSOS()">Send SOS</button>
     <p class="status" id="status"></p>
@@ -32,9 +41,11 @@
             async function success(position) {
                 const latitude = position.coords.latitude;
                 const longitude = position.coords.longitude;
-                const details = document.getElementById("details").value;
+                const people = document.getElementById("people").value;
+                const problem = document.getElementById("problem").value;
+                const message = document.getElementById("message").value;
 
-                const payload = { latitude, longitude, details };
+                const payload = { latitude, longitude, people, problem, message };
 
                 try {
                     const response = await fetch('/Home/SendSOS', {

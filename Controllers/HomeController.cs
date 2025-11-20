@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Team2_EarthquakeAlertApp.Models;
+using Team2_EarthquakeAlertApp.Services;
 
 namespace Team2_EarthquakeAlertApp.Controllers
 {
@@ -14,6 +15,8 @@ namespace Team2_EarthquakeAlertApp.Controllers
             "Minor tremor recorded 2 km offshore.",
             "Bridge inspection underway due to quake impact."
         };
+
+        private readonly DynamoDbService _dynamoDbService = new DynamoDbService();
         private static readonly Random Rand = new();
 
         public IActionResult Login()
@@ -69,23 +72,17 @@ namespace Team2_EarthquakeAlertApp.Controllers
         }
         public IActionResult SOS()
         {
-            var role = HttpContext.Session.GetString("UserRole");
-            if (role != "DisasterVictim")
-            {
-                return RedirectToAction("Login");
-            }
-
             return View();
         }
 
         [HttpPost]
-        public IActionResult SendSOS([FromBody] SosRequest request)
+        public async Task<IActionResult> SendSOS([FromBody] SosRequest request)
         {
             if (request == null)
                 return BadRequest("No data received.");
 
-            Console.WriteLine($"SOS received: Lat={request.Latitude}, Lng={request.Longitude}" +
-                $", Details={request.Description}");
+            // Pass data to the SendAlert call, where it is processed and saved to DynamoDB
+            string result = await _dynamoDbService.SendAlert(request);
 
             return Ok();
         }
