@@ -36,6 +36,9 @@ namespace Team2_EarthquakeAlertApp.Controllers
                 return View();
             }
 
+            HttpContext.Session.SetString("UserEmail", user.Email);
+            HttpContext.Session.SetString("UserRole", user.Role);
+
             // If valid First Responder
             if (user.Role == "FirstResponder")
             {
@@ -56,10 +59,22 @@ namespace Team2_EarthquakeAlertApp.Controllers
 
         public IActionResult firstRespDashboard()
         {
+            var role = HttpContext.Session.GetString("UserRole");
+            if (role != "FirstResponder")
+            {
+                return RedirectToAction("Login");
+            }
+
             return View();
         }
         public IActionResult SOS()
         {
+            var role = HttpContext.Session.GetString("UserRole");
+            if (role != "DisasterVictim")
+            {
+                return RedirectToAction("Login");
+            }
+
             return View();
         }
 
@@ -81,7 +96,7 @@ namespace Team2_EarthquakeAlertApp.Controllers
             HttpContext.Session.Clear();          
             return RedirectToAction("Login");     
         }
-        
+
         [HttpGet]
         public JsonResult GetNewMessage()
         {
