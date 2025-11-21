@@ -2,6 +2,7 @@
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.DocumentModel;
+using Amazon.DynamoDBv2.Model;
 using Amazon.Runtime;
 using System.Threading.Tasks;
 using Team2_EarthquakeAlertApp.Models;
@@ -34,21 +35,80 @@ namespace Team2_EarthquakeAlertApp.Services
             {
                 ["timestamp"] = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
                 ["accepted"] = false,
-                ["longitude"] = request.Longitude,
-                ["latitude"] = request.Latitude,
-                ["people"] = request.People,
-                ["message"] = request.Message,
-                ["problem"] = request.Problem
+                ["longitude"] = request.longitude,
+                ["latitude"] = request.latitude,
+                ["people"] = request.people,
+                ["message"] = request.message,
+                ["problem"] = request.problem
             };
 
             try
             {
                 await SosAlertTable.PutItemAsync(sosDoc);
-                return $"Successfully sent alert: {request.Problem}";
+                return $"Successfully sent alert: {request.problem}";
             }
             catch (Exception ex)
             {
                 return $"Error sending alert: {ex.Message}";
+            }
+        }
+
+        public async Task<List<SosRequest>> GetActiveAlerts()
+        {
+            using (var context = new DynamoDBContext(DynamoDBClient))
+            {
+                var conditions = new List<ScanCondition>
+                {
+                    new ScanCondition("accepted", ScanOperator.Equal, false)
+                };
+
+                var search = context.ScanAsync<SosRequest>(conditions);
+
+                return await search.GetRemainingAsync();
+            }
+        }
+        public async Task<string> UpdateAlertStatus(string timestamp, string newStatus)
+        {
+            if (string.IsNullOrEmpty(timestamp))
+            {
+                return "Error: Timestamp cannot be empty.";
+            }
+
+            try
+            {
+                bool acceptedValue = newStatus.Equals("Accepted", StringComparison.OrdinalIgnoreCase);
+                var key = new Dictionary<string, AttributeValue>
+                {
+                    { "timestamp", new AttributeValue { S = timestamp } }
+                };
+
+                var updates = new Dictionary<string, AttributeValueUpdate>
+                {
+                    {
+                        "accepted",
+                        new AttributeValueUpdate
+                        {
+                            Action = AttributeAction.PUT,
+                            Value = new AttributeValue { BOOL = acceptedValue }
+                        }
+                    }
+                };
+
+                var request = new UpdateItemRequest
+                {
+                    TableName = TableName, 
+                    Key = key,
+                    AttributeUpdates = updates,
+                    ReturnValues = "NONE"
+                };
+
+                await DynamoDBClient.UpdateItemAsync(request);
+
+                return $"Successfully updated alert {timestamp} to accepted-status: {acceptedValue}";
+            }
+            catch (Exception ex)
+            {
+                return $"Error updating alert status for {timestamp}: {ex.Message}";
             }
         }
     }

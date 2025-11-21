@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Team2_EarthquakeAlertApp.Models;
 using Team2_EarthquakeAlertApp.Services;
+using System.Threading.Tasks;
 
 namespace Team2_EarthquakeAlertApp.Controllers
 {
@@ -73,6 +74,35 @@ namespace Team2_EarthquakeAlertApp.Controllers
         public IActionResult SOS()
         {
             return View();
+        }
+        public async Task<IActionResult> DistressAlerts()
+        {
+            var role = HttpContext.Session.GetString("UserRole");
+            if (role != "FirstResponder")
+            {
+                return RedirectToAction("Login");
+            }
+
+            List<SosRequest> activeAlerts = await _dynamoDbService.GetActiveAlerts();
+
+            return View(activeAlerts);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AcceptAlert([FromBody] Dictionary<string, string> data)
+        {
+            if (data == null || !data.TryGetValue("timestamp", out string timestamp))
+            {
+                return BadRequest("Missing alert timestamp.");
+            }
+
+            string result = await _dynamoDbService.UpdateAlertStatus(timestamp, "Accepted");
+
+            if (result.StartsWith("Error"))
+            {
+                return StatusCode(500, result);
+            }
+            return Ok();
         }
 
         [HttpPost]
