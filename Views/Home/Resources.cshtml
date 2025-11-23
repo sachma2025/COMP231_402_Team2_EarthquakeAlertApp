@@ -1,0 +1,53 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resources – First Responder</title>
+    <link rel="stylesheet" href="~/css/firstRespDashboard.css" />
+</head>
+<body>
+    <header class="navbar">
+        <div class="navbar-left">
+            <img src="https://cdn-icons-png.flaticon.com/512/564/564619.png" alt="Logo" class="logo">
+            <div class="app-info">
+                <h1>Earthquake Disaster App</h1>
+                <p>First Responder Account: FR-2847</p>
+            </div>
+        </div>
+        <form asp-controller="Home" asp-action="Logout" method="post">
+            <button type="submit" class="logout-btn">Logout</button>
+        </form>
+    </header>
+
+    <main class="main-content">
+        <section class="left-panel">
+            <div class="map-card">
+                <h2>Available Resources</h2>
+                <p>Select a resource below:</p>
+                <ul class="resource-list">
+                    <li>
+                        <button class="action-btn resources" onclick="window.location.href='/Home/NearestHospital'">Find Nearest Hospital</button>
+                    </li>
+                    <li>
+                        <button class="action-btn report">Request Ambulance Team</button>
+                    </li>
+                    <li>
+                        <button class="action-btn emergency">Request Fire Department</button>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <aside class="right-panel">
+            <h2>Tips</h2>
+            <p>Use “Find Nearest Hospital” to quickly identify the closest medical facility based on your current GPS location.</p>
+            <p>Use “Request Ambulance Team” to quickly dispatch paramedics to the affected area for on-site triage and patient transport.</p>
+            <p>Use “Request Fire Department” to respond to structural damage, gas leaks, or fires that pose an immediate hazard in the disaster zone.</p>
+        </aside>
+    </main>
+</body>
+</html>

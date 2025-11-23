@@ -75,6 +75,14 @@ namespace Team2_EarthquakeAlertApp.Controllers
         {
             return View();
         }
+        public IActionResult Resources()
+        {
+            return View();
+        }
+        public IActionResult NearestHospital()
+        {
+            return View();
+        }
         public async Task<IActionResult> DistressAlerts()
         {
             var role = HttpContext.Session.GetString("UserRole");
