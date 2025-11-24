@@ -1,0 +1,117 @@
+﻿* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+body {
+    background: #1e293b;
+    color: #111;
+    min-height: 100vh;
+    padding-top: 60px;
+}
+
+.fixed-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background-color: #f8f8f8;
+    color: #111;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+    .fixed-header h2 {
+        margin: 0;
+        font-size: 1.8rem;
+    }
+
+.alerts-container {
+    width: 95%;
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 0 10px;
+}
+
+.alert-card {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-left: 5px solid #ef4444;
+    transition: transform 0.2s;
+}
+
+    .alert-card:hover {
+        transform: translateY(-2px);
+    }
+
+.alert-details {
+    flex-grow: 1;
+    margin-right: 20px;
+}
+
+.detail-row {
+    display: flex;
+    margin-bottom: 5px;
+    line-height: 1.4;
+}
+
+    .detail-row .label {
+        font-weight: 600;
+        color: #64748b;
+        min-width: 120px;
+    }
+
+    .detail-row .value {
+        color: #1f2937;
+        word-break: break-word;
+    }
+
+.full-message {
+    padding-top: 10px;
+    border-top: 1px solid #e2e8f0;
+    flex-direction: column;
+}
+
+    .full-message .value {
+        margin-top: 5px;
+        font-style: italic;
+    }
+
+.alert-actions {
+    display: flex;
+    align-items: flex-start;
+}
+
+.action-btn.accept-btn {
+    background-color: #22c55e;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+    .action-btn.accept-btn:hover {
+        background-color: #16a34a;
+    }
+
+.no-alerts-message {
+    color: #cbd5e1;
+    text-align: center;
+    margin-top: 50px;
+    font-size: 1.2rem;
+}

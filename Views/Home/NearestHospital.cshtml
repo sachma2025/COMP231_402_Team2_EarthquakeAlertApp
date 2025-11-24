@@ -1,0 +1,172 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Find Nearest Hospital</title>
+    <link rel="stylesheet" href="~/css/firstRespDashboard.css" />
+
+    <style>
+        .nearest-hospital-container {
+            padding: 20px;
+        }
+        .card {
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        #output {
+            margin-top: 10px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            min-height: 80px;
+        }
+        .back-btn {
+            margin-top: 10px;
+            background: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="navbar-left">
+            <img src="https://cdn-icons-png.flaticon.com/512/564/564619.png" alt="Logo" class="logo">
+            <div class="app-info">
+                <h1>Earthquake Disaster App</h1>
+                <p>First Responder Account: FR-2847</p>
+            </div>
+        </div>
+        <form asp-controller="Home" asp-action="Logout" method="post">
+            <button type="submit" class="logout-btn">Logout</button>
+        </form>
+    </header>
+
+    <main class="main-content nearest-hospital-container">
+        <section class="left-panel">
+            <div class="card">
+                <h2>Find Nearest Hospital</h2>
+                <p>
+                    This tool uses your current location (GPS / browser location) to compute the
+                    nearest hospitals distance.
+                </p>
+                <button id="locBtn" class="action-btn resources">
+                    Get My Location &amp; Nearest Hospital
+                </button>
+                <button class="action-btn back" onclick="window.location.href='/Home/Resources'">Back to Resources</button>
+                <div id="output">Click on the button to access your location.</div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const hospitals = [
+            { name: "Vancouver General Hospital", lat: 49.2614, lon: -123.1222 },
+            { name: "Richmond Hospital", lat: 49.1688, lon: -123.1468 },
+            { name: "Lions Gate Hospital", lat: 49.3209, lon: -123.0684 }
+        ];
+
+        function toRad(deg) {
+            return deg * Math.PI / 180;
+        }
+
+        function distanceInKm(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = toRad(lat2 - lat1);
+            const dLon = toRad(lon2 - lon1);
+
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+            return R * c; 
+        }
+
+        const output = document.getElementById('output');
+        const btn = document.getElementById('locBtn');
+
+        btn.addEventListener('click', () => {
+            if (!navigator.geolocation) {
+                output.textContent = "Geolocation is not supported by this browser.";
+                return;
+            }
+
+            output.textContent = "Getting your location…";
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const userLat = position.coords.latitude;
+                    const userLon = position.coords.longitude;
+
+                    if (!hospitals.length) {
+                        output.textContent = "No hospitals configured.";
+                        return;
+                    }
+
+                    const hospitalWithDistances = hospitals.map(h => {
+                        const d = distanceInKm(userLat, userLon, h.lat, h.lon);
+                        return {...h, distanceKm: d};
+                    });
+
+                    hospitalWithDistances.sort((a, b) => a.distanceKm - b.distanceKm);
+
+                    const nearestHospital = hospitalWithDistances[0];
+                    const otherHospitals = hospitalWithDistances.slice(1);
+
+                    const nearestDistance = nearestHospital.distanceKm.toFixed(2);
+                    const mapsUrl =
+                        `https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLon}` +
+                        `&destination=${nearestHospital.lat},${nearestHospital.lon}`;
+
+                    let html =
+                        `Your location:\n` +
+                        `  Latitude: ${userLat}\n` +
+                        `  Longitude: ${userLon}\n\n` +
+                        `Nearest hospital:\n` +
+                        `  Name: ${nearestHospital.name}\n` +
+                        `  Lat: ${nearestHospital.lat}\n` +
+                        `  Lon: ${nearestHospital.lon}\n` +
+                        `  Distance: ${nearestDistance}kms away\n\n` +
+                        `<a href="${mapsUrl}" target="_blank">Open Directions in Google Maps</a>\n`;
+
+                    if (otherHospitals.length > 0) {
+                        html += `\n<hr/>\n<strong>Other hospitals:</strong>\n<ul>`;
+                        otherHospitals.forEach(h => {
+                            const dStr = h.distanceKm.toFixed(2);
+                            html += `<li>${h.name} – ${dStr}kms away (Lat: ${h.lat}, Lon: ${h.lon})</li>`;
+                        });
+                        html += `</ul>`;
+                    }
+
+                    output.innerHTML = html;
+                },
+                (error) => {
+                    switch (error.code) {
+                        case error.PERMISSION_DENIED:
+                            output.textContent = "Permission denied. Please allow location access.";
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            output.textContent = "Location information is unavailable.";
+                            break;
+                        case error.TIMEOUT:
+                            output.textContent = "The request to get your location timed out.";
+                            break;
+                        default:
+                            output.textContent = "An unknown error occurred.";
+                            break;
+                    }
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        });
+    </script>
+</body>
+</html>
