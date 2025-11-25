@@ -1,0 +1,91 @@
+﻿@model List<Team2_EarthquakeAlertApp.Models.SosRequest>
+
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Distress Alerts</title>
+    <link rel="stylesheet" href="~/css/distressAlerts.css" />
+</head>
+<body>
+    <div class="fixed-header">
+        <h2>Distress Alerts</h2>
+    </div>
+
+    <div class="alerts-container">
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var alert in Model)
+            {
+                <div class="alert-card" data-timestamp="@alert.timestamp">
+                    <div class="alert-details">
+                        <div class="detail-row">
+                            <span class="label">Time:</span>
+                            <span class="value">@alert.timestamp</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Location:</span>
+                            <span class="value">@alert.latitude, @alert.longitude</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">People Affected:</span>
+                            <span class="value">@alert.people</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Problem:</span>
+                            <span class="value problem">@alert.problem</span>
+                        </div>
+                        <div class="detail-row full-message">
+                            <span class="label">Message:</span>
+                            <span class="value">@alert.message</span>
+                        </div>
+                    </div>
+
+                    <div class="alert-actions">
+                        <button class="action-btn accept-btn"
+                                onclick="acceptAlert('@alert.timestamp')">
+                            Accept
+                        </button>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <p class="no-alerts-message">No active distress alerts currently available.</p>
+        }
+    </div>
+
+    <script>
+        async function acceptAlert(timestamp) {
+            console.log("Accepting alert with timestamp: " + timestamp);
+
+            try {
+                const response = await fetch('/Home/AcceptAlert', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ timestamp: timestamp, newStatus: 'Accepted' })
+                });
+
+                if (response.ok) {
+                    alert(`Alert ${timestamp} accepted successfully!`);
+
+                    const acceptedCard = document.querySelector(`.alert-card[data-timestamp="${timestamp}"]`);
+                    if (acceptedCard) {
+                        acceptedCard.remove();
+                    }
+                } else {
+                    alert('Failed to accept alert.');
+                }
+            } catch (error) {
+                console.error('Network or server error:', error);
+                alert('A network error occurred.');
+            }
+        }
+    </script>
+</body>
+</html>

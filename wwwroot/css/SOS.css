@@ -23,15 +23,19 @@ h2 {
         background: darkred;
     }
 
-textarea {
-    width: 60%;
-    height: 100px;
-    border-radius: 6px;
-    padding: 10px;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    resize: none;
-    margin-top: 20px;
+.sos-form label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.sos-form input[type="number"],
+.sos-form input[type="text"],
+.sos-form textarea {
+    width: 40%;
+    padding: 8px;
+    margin-top: 5px;
+    box-sizing: border-box;
 }
 
 .status {

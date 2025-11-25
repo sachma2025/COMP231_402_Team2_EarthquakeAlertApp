@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Team2_EarthquakeAlertApp.Models;
+using Team2_EarthquakeAlertApp.Services;
+using System.Threading.Tasks;
 
 namespace Team2_EarthquakeAlertApp.Controllers
 {
@@ -14,6 +16,8 @@ namespace Team2_EarthquakeAlertApp.Controllers
             "Minor tremor recorded 2 km offshore.",
             "Bridge inspection underway due to quake impact."
         };
+
+        private readonly DynamoDbService _dynamoDbService = new DynamoDbService();
         private static readonly Random Rand = new();
 
         public IActionResult Login()
@@ -36,6 +40,9 @@ namespace Team2_EarthquakeAlertApp.Controllers
                 return View();
             }
 
+            HttpContext.Session.SetString("UserEmail", user.Email);
+            HttpContext.Session.SetString("UserRole", user.Role);
+
             // If valid First Responder
             if (user.Role == "FirstResponder")
             {
@@ -56,23 +63,73 @@ namespace Team2_EarthquakeAlertApp.Controllers
 
         public IActionResult firstRespDashboard()
         {
+            var role = HttpContext.Session.GetString("UserRole");
+            if (role != "FirstResponder")
+            {
+                return RedirectToAction("Login");
+            }
+
             return View();
         }
         public IActionResult SOS()
         {
             return View();
         }
+        public IActionResult Resources()
+        {
+            return View();
+        }
+        public IActionResult NearestHospital()
+        {
+            return View();
+        }
+        public async Task<IActionResult> DistressAlerts()
+        {
+            var role = HttpContext.Session.GetString("UserRole");
+            if (role != "FirstResponder")
+            {
+                return RedirectToAction("Login");
+            }
+
+            List<SosRequest> activeAlerts = await _dynamoDbService.GetActiveAlerts();
+
+            return View(activeAlerts);
+        }
 
         [HttpPost]
-        public IActionResult SendSOS([FromBody] SosRequest request)
+        public async Task<IActionResult> AcceptAlert([FromBody] Dictionary<string, string> data)
+        {
+            if (data == null || !data.TryGetValue("timestamp", out string timestamp))
+            {
+                return BadRequest("Missing alert timestamp.");
+            }
+
+            string result = await _dynamoDbService.UpdateAlertStatus(timestamp, "Accepted");
+
+            if (result.StartsWith("Error"))
+            {
+                return StatusCode(500, result);
+            }
+            return Ok();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SendSOS([FromBody] SosRequest request)
         {
             if (request == null)
                 return BadRequest("No data received.");
 
-            Console.WriteLine($"SOS received: Lat={request.Latitude}, Lng={request.Longitude}" +
-                $", Details={request.Description}");
+            // Pass data to the SendAlert call, where it is processed and saved to DynamoDB
+            string result = await _dynamoDbService.SendAlert(request);
 
             return Ok();
+        }
+
+        [HttpPost]
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();          
+            return RedirectToAction("Login");     
         }
 
         [HttpGet]
