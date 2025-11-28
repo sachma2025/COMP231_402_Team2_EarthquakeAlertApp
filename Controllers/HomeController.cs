@@ -2,6 +2,10 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Team2_EarthquakeAlertApp.Models;
 using Team2_EarthquakeAlertApp.Services;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
+
 using System.Threading.Tasks;
 
 namespace Team2_EarthquakeAlertApp.Controllers
@@ -19,6 +23,14 @@ namespace Team2_EarthquakeAlertApp.Controllers
 
         private readonly DynamoDbService _dynamoDbService = new DynamoDbService();
         private static readonly Random Rand = new();
+
+        private readonly IWebHostEnvironment _env;
+
+        public HomeController(IWebHostEnvironment env)
+        {
+            _env = env;
+        }
+
 
         public IActionResult Login()
         {
@@ -131,6 +143,51 @@ namespace Team2_EarthquakeAlertApp.Controllers
             HttpContext.Session.Clear();          
             return RedirectToAction("Login");     
         }
+
+        public IActionResult VictimForm()
+        {
+            // Auto-fill if logged in
+            ViewBag.UserName = HttpContext.Session.GetString("UserEmail") ?? "";
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> VictimForm(VictimReport report, IFormFile? injuryPhoto)
+        {
+            // Auto-fill name if logged in
+            string? sessionUser = HttpContext.Session.GetString("UserEmail");
+
+            if (!string.IsNullOrEmpty(sessionUser))
+                report.Name = sessionUser;
+
+            
+            if (injuryPhoto != null)
+            {
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(injuryPhoto.FileName);
+                string savePath = Path.Combine(_env.WebRootPath, "victim_photos", fileName);
+
+                Directory.CreateDirectory(Path.GetDirectoryName(savePath)!);
+
+                using (var stream = new FileStream(savePath, FileMode.Create))
+                {
+                    await injuryPhoto.CopyToAsync(stream);
+                }
+
+                report.PhotoPath = "/victim_photos/" + fileName;
+            }
+
+            
+            await _dynamoDbService.SaveVictimReport(report);
+
+            return RedirectToAction("SOS");
+        }
+
+        public DynamoDbService Get_dynamoDbService()
+        {
+            return _dynamoDbService;
+        }
+
+        
 
         [HttpGet]
         public JsonResult GetNewMessage()

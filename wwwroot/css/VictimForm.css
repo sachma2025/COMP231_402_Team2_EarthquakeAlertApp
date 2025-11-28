@@ -1,0 +1,229 @@
+﻿body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f0f2f5;
+    margin: 0;
+    padding: 0;
+}
+
+/* Page Title at the top center */
+h2 {
+    text-align: center;
+    color: #d9534f;
+    margin: 40px 0 10px 0;
+    font-size: 32px;
+    font-weight: 600;
+}
+
+/* Location status text */
+#locationStatus {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Form wrapper to center the form horizontally */
+.form-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+/* Form Container */
+form#victimForm {
+    background-color: #fff;
+    padding: 40px 50px;
+    border-radius: 20px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    width: 80%;
+    max-width: 900px;
+    box-sizing: border-box;
+}
+
+/* Labels */
+label {
+    display: block;
+    margin-top: 20px;
+    font-weight: 500;
+    color: #444;
+    font-size: 16px;
+}
+
+/* Inputs, Select, Textarea */
+/* Name input field styling */
+input#name {
+    width: 100%;
+    padding: 14px 18px;
+    margin-top: 6px;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    transition: all 0.3s;
+    box-sizing: border-box;
+}
+
+    /* Editable field focus effect */
+    input#name:focus {
+        border-color: #d9534f;
+        box-shadow: 0 0 10px rgba(217, 83, 79, 0.2);
+        outline: none;
+    }
+
+    /* Greyed out readonly style */
+    input#name[readonly] {
+        background-color: #eee;
+        cursor: not-allowed;
+        color: #555;
+    }
+
+
+input[type="text"], input[type="file"], select, textarea {
+    width: 100%;
+    padding: 14px 18px;
+    margin-top: 6px;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    transition: all 0.3s;
+}
+
+    input[type="text"]:focus, select:focus, textarea:focus {
+        border-color: #d9534f;
+        box-shadow: 0 0 10px rgba(217, 83, 79, 0.2);
+        outline: none;
+    }
+
+textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* Photo Preview */
+#previewImg {
+    display: none;
+    margin-top: 10px;
+    max-width: 100%;
+    border-radius: 12px;
+    border: 2px solid #d9534f;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+/* Map Styling */
+#map {
+    height: 250px;
+    width: 100%;
+    margin-top: 25px;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+}
+
+/* Injury Level Dropdown Colors */
+select#injury option[value="Minor"] {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+select#injury option[value="Moderate"] {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+select#injury option[value="Severe"] {
+    background-color: #ffe5b4;
+    color: #b85c00;
+}
+
+select#injury option[value="Critical"] {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Submit Button */
+button#submitBtn {
+    margin-top: 30px;
+    padding: 16px;
+    width: 100%;
+    font-size: 17px;
+    background-color: #d9534f;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+    button#submitBtn:hover:not(:disabled) {
+        background-color: #c9302c;
+        transform: translateY(-2px);
+    }
+
+    button#submitBtn:disabled {
+        background-color: #f5a5a0;
+        cursor: not-allowed;
+    }
+
+/* Status & Loading */
+p#status, .loading {
+    margin-top: 20px;
+    text-align: center;
+    font-weight: 500;
+    color: #d9534f;
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    form#victimForm {
+        width: 90%; /* slightly wider on smaller desktops/tablets */
+        padding: 35px 40px;
+    }
+}
+
+@media (max-width: 768px) {
+    form#victimForm {
+        width: 95%; /* almost full width on tablets */
+        padding: 30px 35px;
+    }
+
+    h2 {
+        font-size: 28px; /* slightly smaller title */
+    }
+
+    input[type="text"],
+    input[type="file"],
+    select,
+    textarea,
+    button#submitBtn {
+        font-size: 14px; /* smaller font for inputs and button */
+        padding: 12px 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    form#victimForm {
+        width: 95%; /* nearly full width on mobile */
+        padding: 25px 20px;
+    }
+
+    h2 {
+        font-size: 24px;
+    }
+
+    input[type="text"],
+    input[type="file"],
+    select,
+    textarea,
+    button#submitBtn {
+        font-size: 13px;
+        padding: 10px 12px;
+    }
+
+    #map {
+        height: 200px; /* smaller map on mobile */
+    }
+
+    #previewImg {
+        max-width: 100%;
+    }
+}
+

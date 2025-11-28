@@ -141,7 +141,72 @@
                 list.prepend(li);
             }
 
+            // --- Victim updates and markers ---
+            let displayedVictims = new Set();
+            const markerGroup = L.layerGroup().addTo(map);
+
+
+            function injuryColor(level) {
+                switch (level) {
+                    case "Minor": return "green";
+                    case "Moderate": return "yellow";
+                    case "Severe": return "orange";
+                    case "Critical": return "red";
+                    default: return "blue";
+                }
+            }
+
+            function fetchVictims() {
+                fetch('/Victim/GetVictims')
+                    .then(res => res.json())
+                    .then(victims => {
+                        victims.forEach(v => {
+                            if (!displayedVictims.has(v.name)) {
+                                displayedVictims.add(v.name);
+
+                                // --- Add update to UI ---
+                                const list = document.querySelector(".updates-list");
+                                const li = document.createElement("li");
+                                li.className = `update-item ${injuryColor(v.injuryLevel)}`;
+                                li.innerHTML =
+                                    `<span>Victim: ${v.name} — ${v.injuryLevel}</span>
+                                     <span class="time">Just now</span>`;
+                                list.prepend(li);
+
+                                // --- Map Marker ---
+                                const coords = v.location.split(",");
+                                const lat = parseFloat(coords[0]);
+                                const lng = parseFloat(coords[1]);
+
+                                const marker = L.circleMarker([lat, lng], {
+                                    radius: 10,
+                                    color: injuryColor(v.injuryLevel),
+                                    fillColor: injuryColor(v.injuryLevel),
+                                    fillOpacity: 0.9
+                                }).addTo(markerGroup);
+
+                                marker.bindPopup(`
+                                    <strong>${v.name}</strong><br>
+                                    Injury: ${v.injuryLevel}<br>
+                                    Location: ${v.location}<br>
+                                    Notes: ${v.notes}
+                                `);
+
+                                // --- Play alert sound ---
+                                alertSound.play();
+
+                                // --- Critical popup ---
+                                if (v.injuryLevel === "Critical") {
+                                    alert("⚠ CRITICAL VICTIM REPORTED:\n" +
+                                        `${v.name} at ${v.location}`);
+                                }
+                            }
+                        });
+                    });
+            }
+
             setInterval(addRandomUpdate, 10000);
+            setInterval(fetchVictims, 15000);
         });
     </script>
 

@@ -23,6 +23,22 @@ h2 {
         background: darkred;
     }
 
+.victim-btn {
+    padding: 20px 40px;
+    background: red;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+    .victim-btn:hover {
+        background-color: #e68900;
+    }
+
+
 .sos-form label {
     display: block;
     margin-top: 10px;
