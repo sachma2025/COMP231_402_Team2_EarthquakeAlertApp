@@ -67,6 +67,14 @@ namespace Team2_EarthquakeAlertApp.Services
                 return await search.GetRemainingAsync();
             }
         }
+
+        public async Task SaveVictimReport(VictimReport report)
+        {
+            using var context = new DynamoDBContext(DynamoDBClient);
+            report.timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
+            await context.SaveAsync(report);
+        }
+
         public async Task<string> UpdateAlertStatus(string timestamp, string newStatus)
         {
             if (string.IsNullOrEmpty(timestamp))
@@ -111,5 +119,13 @@ namespace Team2_EarthquakeAlertApp.Services
                 return $"Error updating alert status for {timestamp}: {ex.Message}";
             }
         }
+
+        public async Task<List<VictimReport>> GetVictimReports()
+        {
+            using var context = new DynamoDBContext(DynamoDBClient);
+            var search = context.ScanAsync<VictimReport>(new List<ScanCondition>());
+            return await search.GetRemainingAsync();
+        }
+
     }
 }
