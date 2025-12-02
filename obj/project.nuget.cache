@@ -1,13 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "jNi5OkLXuAw=",
+  "dgSpecHash": "K3rUmgycxMY=",
   "success": true,
-  "projectFilePath": "C:\\Users\\User\\OneDrive\\Desktop\\Earthquake App\\COMP231_402_Team2_EarthquakeAlertApp\\Team2_EarthquakeAlertApp.csproj",
+  "projectFilePath": "C:\\Users\\sachm\\Desktop\\COMP231_402_Team2_EarthquakeAlertApp-main\\COMP231_402_Team2_EarthquakeAlertApp-main\\Team2_EarthquakeAlertApp.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\User\\.nuget\\packages\\awssdk.core\\4.0.3\\awssdk.core.4.0.3.nupkg.sha512",
-    "C:\\Users\\User\\.nuget\\packages\\awssdk.dynamodbv2\\4.0.9.5\\awssdk.dynamodbv2.4.0.9.5.nupkg.sha512",
-    "C:\\Users\\User\\.nuget\\packages\\awssdk.s3\\4.0.11.1\\awssdk.s3.4.0.11.1.nupkg.sha512",
-    "C:\\Users\\User\\.nuget\\packages\\awssdk.simplesystemsmanagement\\4.0.6.1\\awssdk.simplesystemsmanagement.4.0.6.1.nupkg.sha512"
+    "C:\\Users\\sachm\\.nuget\\packages\\awssdk.core\\4.0.3\\awssdk.core.4.0.3.nupkg.sha512",
+    "C:\\Users\\sachm\\.nuget\\packages\\awssdk.dynamodbv2\\4.0.9.5\\awssdk.dynamodbv2.4.0.9.5.nupkg.sha512",
+    "C:\\Users\\sachm\\.nuget\\packages\\awssdk.s3\\4.0.11.1\\awssdk.s3.4.0.11.1.nupkg.sha512",
+    "C:\\Users\\sachm\\.nuget\\packages\\awssdk.simplesystemsmanagement\\4.0.6.1\\awssdk.simplesystemsmanagement.4.0.6.1.nupkg.sha512"
   ],
   "logs": []
 }

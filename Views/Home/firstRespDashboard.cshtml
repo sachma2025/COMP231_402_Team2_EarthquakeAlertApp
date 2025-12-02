@@ -11,10 +11,8 @@
 
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-
-
-
 </head>
+
 <body>
     <header class="navbar">
         <div class="navbar-left">
@@ -74,7 +72,7 @@
             </div>
         </section>
 
-        <!-- Quick Actions Panel-->
+        <!-- Quick Actions Panel -->
         <aside class="right-panel">
             <h2>Quick Actions</h2>
             <button class="action-btn report">Report Incident</button>
@@ -83,33 +81,29 @@
         </aside>
     </main>
 
-
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
     <script>
         window.addEventListener("load", () => {
-            // Initialize Leaflet map
-            const map = L.map('map').setView([49.2827, -123.1207], 12); // Vancouver center
 
-            // Add OpenStreetMap tiles
+
+            const map = L.map('map').setView([49.2827, -123.1207], 12);
+
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; OpenStreetMap contributors'
             }).addTo(map);
 
-            // Example markers for incidents
-            const incidents = [
+            const presetIncidents = [
                 { lat: 49.283, lng: -123.115, title: "Downtown Incident" },
                 { lat: 49.263, lng: -123.138, title: "Kitsilano Damage" },
                 { lat: 49.270, lng: -123.100, title: "Gastown Collapse" }
             ];
 
-            incidents.forEach(incident => {
-                L.marker([incident.lat, incident.lng]).addTo(map)
-                    .bindPopup(incident.title);
+            presetIncidents.forEach(i => {
+                L.marker([i.lat, i.lng]).addTo(map).bindPopup(i.title);
             });
 
-            // --- Real-time updates simulation ---
             let lastColor = null;
 
             function addRandomUpdate() {
@@ -125,26 +119,20 @@
                 const message = responses[Math.floor(Math.random() * responses.length)];
                 const time = new Date().toLocaleTimeString();
 
-                // pick a color different from the last one
                 let color;
-                do {
-                    color = colors[Math.floor(Math.random() * colors.length)];
-                } while (color === lastColor);
+                do { color = colors[Math.floor(Math.random() * colors.length)]; }
+                while (color === lastColor);
                 lastColor = color;
 
                 const list = document.querySelector(".updates-list");
-                if (!list) return;
-
                 const li = document.createElement("li");
                 li.className = `update-item ${color}`;
                 li.innerHTML = `<span>${message}</span><span class="time">${time}</span>`;
                 list.prepend(li);
             }
 
-            // --- Victim updates and markers ---
-            let displayedVictims = new Set();
-            const markerGroup = L.layerGroup().addTo(map);
-
+            const displayedVictims = new Set();
+            const victimMarkerGroup = L.layerGroup().addTo(map);
 
             function injuryColor(level) {
                 switch (level) {
@@ -161,10 +149,10 @@
                     .then(res => res.json())
                     .then(victims => {
                         victims.forEach(v => {
+
                             if (!displayedVictims.has(v.name)) {
                                 displayedVictims.add(v.name);
 
-                                // --- Add update to UI ---
                                 const list = document.querySelector(".updates-list");
                                 const li = document.createElement("li");
                                 li.className = `update-item ${injuryColor(v.injuryLevel)}`;
@@ -173,7 +161,6 @@
                                      <span class="time">Just now</span>`;
                                 list.prepend(li);
 
-                                // --- Map Marker ---
                                 const coords = v.location.split(",");
                                 const lat = parseFloat(coords[0]);
                                 const lng = parseFloat(coords[1]);
@@ -183,7 +170,7 @@
                                     color: injuryColor(v.injuryLevel),
                                     fillColor: injuryColor(v.injuryLevel),
                                     fillOpacity: 0.9
-                                }).addTo(markerGroup);
+                                }).addTo(victimMarkerGroup);
 
                                 marker.bindPopup(`
                                     <strong>${v.name}</strong><br>
@@ -191,26 +178,59 @@
                                     Location: ${v.location}<br>
                                     Notes: ${v.notes}
                                 `);
-
-                                // --- Play alert sound ---
-                                alertSound.play();
-
-                                // --- Critical popup ---
-                                if (v.injuryLevel === "Critical") {
-                                    alert("⚠ CRITICAL VICTIM REPORTED:\n" +
-                                        `${v.name} at ${v.location}`);
-                                }
                             }
                         });
                     });
             }
 
-            setInterval(addRandomUpdate, 10000);
-            setInterval(fetchVictims, 15000);
+                    const dynamicMarkers = [];
+        let colorIndex = 0;
+        const cycleColors = ["red", "yellow", "blue"];
+
+        function nextColor() {
+            const color = cycleColors[colorIndex];
+            colorIndex = (colorIndex + 1) % cycleColors.length;
+            return color;
+        }
+
+        function addIncidentMarker(lat, lng, message) {
+            const marker = L.marker([lat, lng]).addTo(map)
+                .bindPopup(message);
+            dynamicMarkers.push(marker);
+        }
+
+        function appendDynamicUpdate(message, time) {
+            const list = document.querySelector(".updates-list");
+            const li = document.createElement("li");
+
+            li.className = `update-item ${nextColor()}`;
+
+            li.innerHTML = `
+                <span>${message}</span>
+                <span class="time">${time}</span>
+            `;
+
+            list.prepend(li);
+        }
+
+        async function fetchUpdate() {
+            try {
+                const response = await fetch("/Home/GetNewMessage");
+                const data = await response.json();
+
+                appendDynamicUpdate(data.message, data.time);
+                addIncidentMarker(data.lat, data.lng, data.message);
+
+            } catch (err) {
+                console.log("Error fetching dynamic update:", err);
+            }
+        }
+
+            //setInterval(addRandomUpdate, 10000);  // simulated message updates
+            setInterval(fetchVictims, 15000);     // victim updates
+            setInterval(fetchUpdate, 10000);      // REAL dynamic incidents from server
         });
     </script>
-
-
 
 </body>
 </html>

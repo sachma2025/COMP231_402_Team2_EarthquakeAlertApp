@@ -187,14 +187,32 @@ namespace Team2_EarthquakeAlertApp.Controllers
             return _dynamoDbService;
         }
 
-        
+        private static int _incidentIndex = 0;
 
         [HttpGet]
         public JsonResult GetNewMessage()
         {
-            var msg = Messages[Rand.Next(Messages.Count)];
-            var time = DateTime.Now.ToString("h:mm:ss tt");
-            return Json(new { message = msg, time });
+            var incidents = new[]
+            {
+                new { message = "Bridge inspection underway due to quake impact.", lat = 49.2734, lng = -123.1219 },
+                new { message = "Gas leak detected on 4th Avenue.", lat = 49.2639, lng = -123.1681 },
+                new { message = "Power outage affecting Yaletown district.", lat = 49.2765, lng = -123.1231 },
+                new { message = "Aftershock detected near downtown Vancouver.", lat = 49.2827, lng = -123.1207 },
+                new { message = "Collapsed building reported in Gastown.", lat = 49.2834, lng = -123.1080 },
+                new { message = "Multiple injuries reported at Chinatown.", lat = 49.2796, lng = -123.1021 }
+            };
+            var selected = incidents[_incidentIndex];
+
+            _incidentIndex = (_incidentIndex + 1) % incidents.Length;
+
+            return Json(new
+            {
+                message = selected.message,
+                lat = selected.lat,
+                lng = selected.lng,
+                time = DateTime.Now.ToString("h:mm:ss tt")
+            });
         }
+
     }
 }
