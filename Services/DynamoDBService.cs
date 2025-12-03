@@ -126,6 +126,11 @@ namespace Team2_EarthquakeAlertApp.Services
             var search = context.ScanAsync<VictimReport>(new List<ScanCondition>());
             return await search.GetRemainingAsync();
         }
+        public async Task SavePublicAlert(PublicAlert alert)
+        {
+            using var context = new DynamoDBContext(DynamoDBClient);
+            await context.SaveAsync(alert);
+        }
 
     }
 }

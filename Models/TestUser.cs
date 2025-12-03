@@ -19,6 +19,13 @@
                 Email = "firstresponder@test.com",
                 Password = "fr123",
                 Role = "FirstResponder"
+            },
+            new TestUser
+            {
+                Token = "ES-5521",
+                Email = "envspecialist@test.com",
+                Password = "es123",
+                Role = "EnvironmentalSpecialist"
             }
         };
     }

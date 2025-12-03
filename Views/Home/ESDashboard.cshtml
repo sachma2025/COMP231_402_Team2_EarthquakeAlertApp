@@ -1,0 +1,133 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Environmental Specialist Dashboard</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .btn {
+            margin-top: 20px;
+            width: 100%;
+            padding: 12px;
+            background: #0077cc;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        #status {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+    </style>
+
+</head>
+<body>
+
+    <div class="container">
+        <h2>Send Public Alert</h2>
+
+        <form id="alertForm">
+            <label>Alert Title:</label>
+            <input type="text" name="title" required />
+
+            <label>Magnitude:</label>
+            <select name="magnitude">
+                <option value="Minor">Minor</option>
+                <option value="Moderate">Moderate</option>
+                <option value="Severe">Severe</option>
+                <option value="Critical">Critical</option>
+            </select>
+
+            <label>Description:</label>
+            <textarea name="description"></textarea>
+
+            <button type="submit" class="btn">Send Alert</button>
+        </form>
+
+        <p id="status"></p>
+    </div>
+
+    <script>
+        document.getElementById("alertForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const formData = {
+                title: this.title.value,
+                magnitude: this.magnitude.value,
+                description: this.description.value
+            };
+
+            const status = document.getElementById("status");
+            status.textContent = "Sending alert...";
+
+            try {
+                const response = await fetch("/Home/SendPublicAlert", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    status.style.color = "green";
+                    status.textContent = "Alert sent successfully!";
+                } else {
+                    status.style.color = "red";
+                    status.textContent = "Failed to send alert.";
+                }
+            } catch (err) {
+                status.style.color = "red";
+                status.textContent = "Network error.";
+            }
+        });
+    </script>
+
+</body>
+</html>

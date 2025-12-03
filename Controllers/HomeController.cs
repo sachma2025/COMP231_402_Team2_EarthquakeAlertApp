@@ -61,6 +61,12 @@ namespace Team2_EarthquakeAlertApp.Controllers
                 return RedirectToAction("firstRespDashboard");
             }
 
+            // If valid Environmental Specialist
+            if (user.Role == "EnvironmentalSpecialist")
+            {
+                return RedirectToAction("ESDashboard");
+            }
+
             // If valid Disaster Victim (for future use)
             if (user.Role == "DisasterVictim")
             {
@@ -83,6 +89,16 @@ namespace Team2_EarthquakeAlertApp.Controllers
 
             return View();
         }
+
+        public IActionResult ESDashboard()
+        {
+            var role = HttpContext.Session.GetString("UserRole");
+            if (role != "EnvironmentalSpecialist")
+                return RedirectToAction("Login");
+
+            return View();
+        }
+
         public IActionResult SOS()
         {
             return View();
@@ -198,6 +214,21 @@ namespace Team2_EarthquakeAlertApp.Controllers
             await _dynamoDbService.SaveVictimReport(report);
 
             return RedirectToAction("SOS");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SendPublicAlert([FromBody] PublicAlert alert)
+        {
+            if (alert == null)
+                return BadRequest("Invalid alert data.");
+
+            // Add timestamp
+            alert.timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
+
+            // Save to DynamoDB
+            await _dynamoDbService.SavePublicAlert(alert);
+
+            return Ok();
         }
 
         public DynamoDbService Get_dynamoDbService()
