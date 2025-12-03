@@ -126,16 +126,34 @@ namespace Team2_EarthquakeAlertApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SendSOS([FromBody] SosRequest request)
+        public async Task<IActionResult> SendSOS(SosRequest request, IFormFile? photo)
         {
             if (request == null)
-                return BadRequest("No data received.");
+                return BadRequest("Invalid request.");
 
-            // Pass data to the SendAlert call, where it is processed and saved to DynamoDB
+            if (photo != null)
+            {
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(photo.FileName);
+                string savePath = Path.Combine(_env.WebRootPath, "sos_photos", fileName);
+
+                Directory.CreateDirectory(Path.GetDirectoryName(savePath)!);
+
+                using (var stream = new FileStream(savePath, FileMode.Create))
+                {
+                    await photo.CopyToAsync(stream);
+                }
+
+                request.photoUrl = "/sos_photos/" + fileName;
+            }
+
+            request.timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
+
+            // Save to DynamoDB
             string result = await _dynamoDbService.SendAlert(request);
 
-            return Ok();
+            return Ok("SOS submitted successfully.");
         }
+
 
         [HttpPost]
         public IActionResult Logout()

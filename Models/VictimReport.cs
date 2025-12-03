@@ -9,9 +9,6 @@
         public string injuryLevel { get; set; }
         public string description { get; set; }
         public string PhotoPath { get; set; }
-      
 
     }
-
-
 }

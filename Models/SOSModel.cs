@@ -6,7 +6,7 @@ namespace Team2_EarthquakeAlertApp.Models
     public class SosRequest
     {
         [DynamoDBHashKey]
-        public string timestamp { get; set; }   // use unix timestamp as a SOS id as well
+        public string timestamp { get; set; }
 
         [DynamoDBProperty]
         public double latitude { get; set; }
@@ -25,5 +25,15 @@ namespace Team2_EarthquakeAlertApp.Models
 
         [DynamoDBProperty]
         public bool? accepted { get; set; }
+
+        [DynamoDBProperty]
+        public string name { get; set; }
+
+        [DynamoDBProperty]
+        public string injuryLevel { get; set; }
+
+        [DynamoDBProperty]
+        public string photoUrl { get; set; }
+
     }
 }

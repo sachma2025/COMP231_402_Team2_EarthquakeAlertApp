@@ -6,76 +6,188 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Send Distress Signal</title>
-    <link rel="stylesheet" href="~/css/SOS.css" />
+    <title>Send SOS</title>
+
+    <link rel="stylesheet" href="~/css/VictimForm.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        .sos-container {
+            max-width: 700px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px 28px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .title {
+            text-align: center;
+            font-size: 26px;
+            color: #b20000;
+            margin-bottom: 10px;
+        }
+
+        label {
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px 12px;
+            margin-top: 6px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+            resize: vertical;
+        }
+
+        textarea {
+            min-height: 120px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            background: red;
+            color: white;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        #map {
+            height: 350px;
+            border-radius: 12px;
+            margin-top: 10px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+    </style>
 </head>
+
 <body>
-    <h2>Send Distress Signal</h2>
 
-    <form id="sosForm" class="sos-form">
-        <label for="people">No. of People Affected:</label>
-        <input type="number" id="people" name="people" min="1" value="1" required>
+    <div class="sos-container">
 
-        <label for="problem">Problem/Situation:</label>
-        <input type="text" id="problem" name="problem" placeholder="e.g., Trapped, Injured, Fire" required>
+        <h2 class="title">Send Distress Signal</h2>
 
-        <label for="message">Detailed Message (Optional):</label>
-        <textarea id="message" name="message" placeholder="Injury severity, specific location details, supplies needed, etc."></textarea>
-    </form>
-    <br>
-    <button class="sos-btn" onclick="sendSOS()">Send SOS</button>
-    <button class="victim-btn" onclick="window.location.href='/Home/VictimForm'">
-        Fill Victim Report Form
-    </button>
-    <p class="status" id="status"></p>
+        <form id="sosForm" enctype="multipart/form-data">
 
-    
+            <label>Name:</label>
+            <input type="text" name="name" value="Unknown User" required />
 
+            <label>No. of People Affected:</label>
+            <input type="number" name="people" min="1" value="1" required />
+
+            <label>Injury Level:</label>
+            <select name="injuryLevel">
+                <option>Minor</option>
+                <option>Moderate</option>
+                <option>Severe</option>
+                <option>Critical</option>
+            </select>
+
+            <label>Problem/Situation:</label>
+            <input type="text" name="problem" placeholder="Trapped, fall injury, fire, etc." required />
+
+            <label>Description / Detailed Message:</label>
+            <textarea name="message" placeholder="Additional information, condition, surroundings..."></textarea>
+
+            <label>Upload Photo (Optional):</label>
+            <input type="file" name="photo" accept="image/*" />
+
+            <label>Drag the pin to your location:</label>
+            <div id="map"></div>
+
+            <input type="hidden" name="latitude" id="latInput" />
+            <input type="hidden" name="longitude" id="lngInput" />
+
+            <button type="submit" class="submit-btn">Send SOS</button>
+            <p id="status" style="margin-top:15px; color:blue; font-weight:600;"></p>
+
+        </form>
+
+        <p id="status" style="text-align:center; margin-top:15px; font-weight:bold;"></p>
+
+    </div>
 
     <script>
-        async function sendSOS() {
-            const statusEl = document.getElementById("status");
-            statusEl.textContent = "Sending distress signal...";
+        document.getElementById("sosForm").addEventListener("submit", async function (e) {
+            e.preventDefault(); // stop full page post
 
-            if (!navigator.geolocation) {
-                statusEl.textContent = "Geolocation is not supported by your browser.";
-                return;
-            }
+            const status = document.getElementById("status");
+            status.textContent = "Submitting report...";
 
-            navigator.geolocation.getCurrentPosition(success, error);
+            const formData = new FormData(this);
 
-            async function success(position) {
-                const latitude = position.coords.latitude;
-                const longitude = position.coords.longitude;
-                const people = document.getElementById("people").value;
-                const problem = document.getElementById("problem").value;
-                const message = document.getElementById("message").value;
+            try {
+                const response = await fetch("/Home/SendSOS", {
+                    method: "POST",
+                    body: formData
+                });
 
-                const payload = { latitude, longitude, people, problem, message };
+                if (response.ok) {
+                    status.style.color = "green";
+                    status.textContent = "Report successfully submitted!";
 
-                try {
-                    const response = await fetch('/Home/SendSOS', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (response.ok) {
-                        statusEl.textContent = "Distress signal sent successfully!";
-                        document.querySelector(".sos-btn").disabled = true;
-                    } else {
-                        statusEl.textContent = "Failed to send SOS.";
-                    }
-                } catch (err) {
-                    console.error(err);
-                    statusEl.textContent = "Network error while sending SOS.";
+                    // disable button to avoid double submission
+                    this.querySelector(".submit-btn").disabled = true;
+                } else {
+                    status.style.color = "red";
+                    status.textContent = "Error submitting report.";
                 }
+            } catch (err) {
+                status.style.color = "red";
+                status.textContent = "Network error while submitting.";
+                console.error(err);
             }
+        });
+    </script>
 
-            function error() {
-                statusEl.textContent = "Unable to retrieve your location.";
-            }
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <script>
+        // Initialize the map at a default point
+        var map = L.map('map').setView([49.2827, -123.1207], 12);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Draggable pin
+        var marker = L.marker([49.2827, -123.1207], { draggable: true }).addTo(map);
+
+        function updateHiddenInputs(lat, lng) {
+            document.getElementById("latInput").value = lat;
+            document.getElementById("lngInput").value = lng;
+        }
+
+        marker.on("dragend", function (e) {
+            var pos = marker.getLatLng();
+            updateHiddenInputs(pos.lat, pos.lng);
+        });
+
+        // On page load, attempt real device location
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((pos) => {
+                const { latitude, longitude } = pos.coords;
+
+                marker.setLatLng([latitude, longitude]);
+                map.setView([latitude, longitude], 14);
+
+                updateHiddenInputs(latitude, longitude);
+            });
         }
     </script>
+
 </body>
 </html>
