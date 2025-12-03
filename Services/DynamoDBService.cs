@@ -131,6 +131,5 @@ namespace Team2_EarthquakeAlertApp.Services
             using var context = new DynamoDBContext(DynamoDBClient);
             await context.SaveAsync(alert);
         }
-
     }
 }

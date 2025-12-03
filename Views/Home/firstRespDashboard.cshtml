@@ -104,6 +104,25 @@
                 L.marker([i.lat, i.lng]).addTo(map).bindPopup(i.title);
             });
 
+                function randomVancouverCoordinate() {
+            const lat = 49.24 + Math.random() * 0.08;
+            const lng = -123.18 + Math.random() * 0.12;
+            return { lat, lng };
+        }
+
+        let frLocation = randomVancouverCoordinate();
+
+        let frMarker = L.marker([frLocation.lat, frLocation.lng], {
+            icon: L.icon({
+                iconUrl: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
+                iconSize: [32, 32],
+                iconAnchor: [16, 32]
+            })
+        }).addTo(map).bindPopup("First Responder Location");
+
+        map.setView([frLocation.lat, frLocation.lng], 13);
+
+
             let lastColor = null;
 
             function addRandomUpdate() {
@@ -193,11 +212,25 @@
             return color;
         }
 
-        function addIncidentMarker(lat, lng, message) {
-            const marker = L.marker([lat, lng]).addTo(map)
-                .bindPopup(message);
+                function addIncidentMarker(lat, lng, message) {
+
+            const googleMapsUrl =
+                `https://www.google.com/maps/dir/?api=1&origin=${frLocation.lat},${frLocation.lng}` +
+                `&destination=${lat},${lng}`;
+
+            const popupHtml = `
+                <strong>${message}</strong><br><br>
+                <a href="${googleMapsUrl}" target="_blank" style="color:blue; text-decoration:underline;">
+                    Get Directions
+                </a>
+            `;
+
+            var marker = L.marker([lat, lng]).addTo(map)
+                .bindPopup(popupHtml);
+
             dynamicMarkers.push(marker);
         }
+
 
         function appendDynamicUpdate(message, time) {
             const list = document.querySelector(".updates-list");
