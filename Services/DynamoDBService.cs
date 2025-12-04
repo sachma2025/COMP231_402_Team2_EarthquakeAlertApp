@@ -11,21 +11,21 @@ namespace Team2_EarthquakeAlertApp.Services
 {
     public class DynamoDbService
     {
+        private readonly AmazonDynamoDBClient _client;
+        private readonly DynamoDBContext _context;
         private const string TableName = "SOSalerts";
         public DynamoDbService() {}
         
         private static readonly AmazonDynamoDBClient DynamoDBClient = InitializeClient();
         private static readonly ITable SosAlertTable = Table.LoadTable(DynamoDBClient, TableName);
 
-        // I did a bad thing here... oh la la 
-        // Will fix later (move hardcoded db credentials AWAY)
         private static AmazonDynamoDBClient InitializeClient()
         {
-            string awsAccessKey = "AKIAWCOLNPESLCIBCUXR";
-            string awsSecretKey = "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";
+            string awsAccessKey = "AKIAQ3PJFD2ROS2MYEPT";
+            string awsSecretKey = "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";
 
             AWSCredentials credentials = new BasicAWSCredentials(awsAccessKey, awsSecretKey);
-            return new AmazonDynamoDBClient(credentials, RegionEndpoint.CACentral1);
+            return new AmazonDynamoDBClient(credentials, RegionEndpoint.USEast1);
         }
 
         // POST a new SOS alert
