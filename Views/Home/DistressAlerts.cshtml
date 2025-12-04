@@ -24,6 +24,10 @@
                 <div class="alert-card" data-timestamp="@alert.timestamp">
                     <div class="alert-details">
                         <div class="detail-row">
+                            <span class="label">Name:</span>
+                            <span class="value">@alert.name</span>
+                        </div>
+                        <div class="detail-row">
                             <span class="label">Time:</span>
                             <span class="value">@alert.timestamp</span>
                         </div>
@@ -43,6 +47,17 @@
                             <span class="label">Message:</span>
                             <span class="value">@alert.message</span>
                         </div>
+                        <p><strong>Message:</strong> @alert.message</p>
+
+                        @if (!string.IsNullOrEmpty(alert.photoUrl))
+                        {
+                            <div class="detail-row">
+                                <span class="label">Photo:</span>
+                                <span class="value">
+                                    <a href="@Url.Content(alert.photoUrl)" target="_blank">View Photo</a>
+                                </span>
+                            </div>
+                        }
                     </div>
 
                     <div class="alert-actions">

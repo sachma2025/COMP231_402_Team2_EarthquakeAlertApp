@@ -35,11 +35,13 @@ namespace Team2_EarthquakeAlertApp.Services
             {
                 ["timestamp"] = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
                 ["accepted"] = false,
+                ["name"] = request.name,
                 ["longitude"] = request.longitude,
                 ["latitude"] = request.latitude,
                 ["people"] = request.people,
                 ["message"] = request.message,
-                ["problem"] = request.problem
+                ["problem"] = request.problem,
+                ["photoUrl"] = request.photoUrl
             };
 
             try
