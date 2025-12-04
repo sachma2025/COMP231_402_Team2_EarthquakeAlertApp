@@ -205,6 +205,10 @@ body {
         background: #ef4444;
     }
 
+    .action-btn.hospital {
+        background: #ee13e3;
+    }
+
     .action-btn:hover {
         opacity: 0.9;
     }

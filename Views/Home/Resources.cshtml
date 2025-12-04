@@ -8,7 +8,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Resources – First Responder</title>
     <link rel="stylesheet" href="~/css/firstRespDashboard.css" />
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <style>
+        #resourceMap {
+            width: 100%;
+            height: 350px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+    </style>
 </head>
+
 <body>
     <header class="navbar">
         <div class="navbar-left">
@@ -28,17 +42,29 @@
             <div class="map-card">
                 <h2>Available Resources</h2>
                 <p>Select a resource below:</p>
+
                 <ul class="resource-list">
                     <li>
-                        <button class="action-btn resources" onclick="window.location.href='/Home/NearestHospital'">Find Nearest Hospital</button>
+                        <button class="action-btn resources" onclick="window.location.href='/Home/NearestHospital'">
+                            Find Nearest Hospital
+                        </button>
                     </li>
                     <li>
-                        <button class="action-btn report">Request Ambulance Team</button>
+                        <button class="action-btn report" onclick="dispatchTeam('Ambulance Team')">
+                            Request Ambulance Team
+                        </button>
                     </li>
                     <li>
-                        <button class="action-btn emergency">Request Fire Department</button>
+                        <button class="action-btn emergency" onclick="dispatchTeam('Fire Department')">
+                            Request Fire Department
+                        </button>
                     </li>
                 </ul>
+
+                <p id="dispatchStatus" style="margin-top: 20px; font-weight: bold; font-size: 1rem;"></p>
+
+                <!-- Map -->
+                <div id="resourceMap"></div>
             </div>
         </section>
 
@@ -49,5 +75,132 @@
             <p>Use “Request Fire Department” to respond to structural damage, gas leaks, or fires that pose an immediate hazard in the disaster zone.</p>
         </aside>
     </main>
+
+    <!-- Dispatch + Map Logic -->
+    <script>
+        const frLocation = { lat: 49.2801, lng: -123.1107 }; // Vancouver Fire Hall #1
+
+        let map;
+        let frMarker;
+
+        let ambulanceMarkers = [];
+        let fireMarkers = [];
+
+        function initMap() {
+            map = L.map('resourceMap').setView([frLocation.lat, frLocation.lng], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            // FR Marker (Green/Blue Dot)
+            frMarker = L.marker([frLocation.lat, frLocation.lng], {
+                icon: L.icon({
+                    iconUrl: "https://maps.google.com/mapfiles/ms/icons/green-dot.png",
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 32]
+                })
+            })
+            .addTo(map)
+            .bindPopup("First Responder Location")
+            .openPopup();
+        }
+
+                function randomVancouverLand() {
+
+            // Safe Vancouver land-only bounding boxes
+            const regions = [
+                // Kitsilano
+                { latMin: 49.258, latMax: 49.273, lngMin: -123.185, lngMax: -123.154 },
+
+                // Fairview
+                { latMin: 49.263, latMax: 49.275, lngMin: -123.147, lngMax: -123.120 },
+
+                // Mount Pleasant
+                { latMin: 49.255, latMax: 49.271, lngMin: -123.115, lngMax: -123.083 },
+
+                // Downtown
+                { latMin: 49.274, latMax: 49.290, lngMin: -123.135, lngMax: -123.107 },
+
+                // West End
+                { latMin: 49.279, latMax: 49.295, lngMin: -123.145, lngMax: -123.120 },
+
+                // South Cambie
+                { latMin: 49.240, latMax: 49.255, lngMin: -123.125, lngMax: -123.105 },
+
+                // Shaughnessy
+                { latMin: 49.243, latMax: 49.264, lngMin: -123.150, lngMax: -123.125 },
+
+                // Riley Park
+                { latMin: 49.240, latMax: 49.255, lngMin: -123.090, lngMax: -123.070 },
+
+                // Kensington
+                { latMin: 49.240, latMax: 49.255, lngMin: -123.065, lngMax: -123.045 }
+            ];
+
+            const r = regions[Math.floor(Math.random() * regions.length)];
+
+            return {
+                lat: r.latMin + Math.random() * (r.latMax - r.latMin),
+                lng: r.lngMin + Math.random() * (r.lngMax - r.lngMin)
+            };
+        }
+
+        function getDistance(lat1, lng1, lat2, lng2) {
+            const p1 = L.latLng(lat1, lng1);
+            const p2 = L.latLng(lat2, lng2);
+            return p1.distanceTo(p2);
+        }
+
+        function calculateETA(distanceMeters) {
+            const speedMetersPerSec = (40 * 1000) / 3600;
+            const etaSec = distanceMeters / speedMetersPerSec;
+            return `${Math.round(etaSec / 60)} minutes`;
+        }
+
+        function dispatchTeam(teamName) {
+
+            const teamLoc = randomVancouverLand();
+            const distance = getDistance(teamLoc.lat, teamLoc.lng, frLocation.lat, frLocation.lng);
+            const eta = calculateETA(distance);
+
+            let markerColor =
+                teamName === "Ambulance Team"
+                    ? "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+                    : "https://maps.google.com/mapfiles/ms/icons/red-dot.png";
+
+            const marker = L.marker([teamLoc.lat, teamLoc.lng], {
+                icon: L.icon({
+                    iconUrl: markerColor,
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 32]
+                })
+            }).addTo(map);
+
+            marker.bindPopup(`
+                <strong>${teamName}</strong><br>
+                Coordinates: (${teamLoc.lat.toFixed(4)}, ${teamLoc.lng.toFixed(4)})<br>
+                ETA to FR: ${eta}
+            `);
+
+            // Store markers so they persist
+            if (teamName === "Ambulance Team") {
+                ambulanceMarkers.push(marker);
+            } else {
+                fireMarkers.push(marker);
+            }
+
+            // Update text message
+            document.getElementById("dispatchStatus").innerHTML =
+                `${teamName} dispatched.<br>
+                Team location: (${teamLoc.lat.toFixed(4)}, ${teamLoc.lng.toFixed(4)})<br>
+                ETA to your location: ${eta}.`;
+        }
+
+        // Load map on page load
+        window.onload = initMap;
+
+    </script>
+
 </body>
 </html>

@@ -76,8 +76,10 @@
         <aside class="right-panel">
             <h2>Quick Actions</h2>
             <button class="action-btn report">Report Incident</button>
-            <button class="action-btn resources" onclick="window.location.href='/Home/Resources'">Request Resources</button>
-            <button class="action-btn emergency" onclick="window.location.href='/Home/DistressAlerts'">Emergency Alerts</button>
+            <button class="action-btn resources" onclick="window.location.href='/Home/Resources'">
+                Request Resources</button>
+            <button class="action-btn emergency" onclick="window.location.href='/Home/DistressAlerts'">
+                Emergency Alerts</button>
         </aside>
     </main>
 
@@ -104,13 +106,48 @@
                 L.marker([i.lat, i.lng]).addTo(map).bindPopup(i.title);
             });
 
-                function randomVancouverCoordinate() {
-            const lat = 49.24 + Math.random() * 0.08;
-            const lng = -123.18 + Math.random() * 0.12;
-            return { lat, lng };
+            function randomVancouverLand() {
+
+            // Safe Vancouver land-only bounding boxes
+            const regions = [
+                // Kitsilano
+                { latMin: 49.258, latMax: 49.273, lngMin: -123.185, lngMax: -123.154 },
+
+                // Fairview
+                { latMin: 49.263, latMax: 49.275, lngMin: -123.147, lngMax: -123.120 },
+
+                // Mount Pleasant
+                { latMin: 49.255, latMax: 49.271, lngMin: -123.115, lngMax: -123.083 },
+
+                // Downtown
+                { latMin: 49.274, latMax: 49.290, lngMin: -123.135, lngMax: -123.107 },
+
+                // West End
+                { latMin: 49.279, latMax: 49.295, lngMin: -123.145, lngMax: -123.120 },
+
+                // South Cambie
+                { latMin: 49.240, latMax: 49.255, lngMin: -123.125, lngMax: -123.105 },
+
+                // Shaughnessy
+                { latMin: 49.243, latMax: 49.264, lngMin: -123.150, lngMax: -123.125 },
+
+                // Riley Park
+                { latMin: 49.240, latMax: 49.255, lngMin: -123.090, lngMax: -123.070 },
+
+                // Kensington
+                { latMin: 49.240, latMax: 49.255, lngMin: -123.065, lngMax: -123.045 }
+            ];
+
+            const r = regions[Math.floor(Math.random() * regions.length)];
+
+            return {
+                lat: r.latMin + Math.random() * (r.latMax - r.latMin),
+                lng: r.lngMin + Math.random() * (r.lngMax - r.lngMin)
+            };
         }
 
-        let frLocation = randomVancouverCoordinate();
+
+        let frLocation = randomVancouverLand()
 
         let frMarker = L.marker([frLocation.lat, frLocation.lng], {
             icon: L.icon({
@@ -121,6 +158,71 @@
         }).addTo(map).bindPopup("First Responder Location");
 
         map.setView([frLocation.lat, frLocation.lng], 13);
+
+        const hospitalList = [
+            { name: "St. Paul's Hospital", lat: 49.2800, lng: -123.1326 },
+            { name: "Vancouver General Hospital", lat: 49.2625, lng: -123.1240 },
+            { name: "Mount Saint Joseph Hospital", lat: 49.2610, lng: -123.0921 },
+            { name: "BC Children's Hospital", lat: 49.2431, lng: -123.1260 }
+        ];
+
+                function getDistance(lat1, lng1, lat2, lng2) {
+            const R = 6371; // km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLng = (lng2 - lng1) * Math.PI / 180;
+
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) *
+                Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLng / 2) * Math.sin(dLng / 2);
+
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        }
+
+                function findNearestHospital() {
+
+            // Compute distances
+            let nearest = null;
+            let bestDistance = Infinity;
+
+            hospitalList.forEach(h => {
+                const d = getDistance(frLocation.lat, frLocation.lng, h.lat, h.lng);
+                if (d < bestDistance) {
+                    bestDistance = d;
+                    nearest = h;
+                }
+            });
+
+            if (!nearest) return;
+
+            // Create Google Maps directions link
+            const googleMapsUrl =
+                `https://www.google.com/maps/dir/?api=1&origin=${frLocation.lat},${frLocation.lng}` +
+                `&destination=${nearest.lat},${nearest.lng}`;
+
+            // Custom hospital marker
+            const hospitalMarker = L.marker([nearest.lat, nearest.lng], {
+                icon: L.icon({
+                    iconUrl: "https://maps.google.com/mapfiles/ms/icons/hospitals.png",
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 32]
+                })
+            }).addTo(map);
+
+            hospitalMarker.bindPopup(`
+                <strong>${nearest.name}</strong><br>
+                Distance: ${bestDistance.toFixed(2)} km<br><br>
+                <a href="${googleMapsUrl}" target="_blank" style="color:blue;text-decoration:underline;">
+                    Get Directions
+                </a>
+            `).openPopup();
+
+            // Center map on hospital
+            map.setView([nearest.lat, nearest.lng], 14);
+        }
+
+
 
 
             let lastColor = null;
