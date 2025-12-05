@@ -2,25 +2,28 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy everything into the container
+# Copy only the project file first (improves caching)
+COPY Team2_EarthquakeAlertApp.csproj ./
+
+# Restore using the specific project file
+RUN dotnet restore Team2_EarthquakeAlertApp.csproj
+
+# Copy the rest of the source code
 COPY . .
 
-# Restore and build
-RUN dotnet restore
-RUN dotnet publish -c Release -o /app --self-contained false
+# Publish the app
+RUN dotnet publish Team2_EarthquakeAlertApp.csproj -c Release -o /app --self-contained false
 
-# Use the ASP.NET runtime image
+# Use ASP.NET runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 
-# Copy app from build stage
+# Copy published app
 COPY --from=build /app .
 
-# Expose Render's expected port
+# Expose Render port
 EXPOSE 8080
-
-# Configure ASP.NET to listen on port 8080
 ENV ASPNETCORE_URLS=http://+:8080
 
-# Start the application
+# Start the app
 ENTRYPOINT ["dotnet", "Team2_EarthquakeAlertApp.dll"]
