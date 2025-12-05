@@ -14,23 +14,26 @@ namespace Team2_EarthquakeAlertApp.Services
         private readonly AmazonDynamoDBClient _client;
         private readonly DynamoDBContext _context;
         private const string TableName = "SOSalerts";
-        public DynamoDbService() {}
-        
-        private static readonly AmazonDynamoDBClient DynamoDBClient = InitializeClient();
-        private static readonly ITable SosAlertTable = Table.LoadTable(DynamoDBClient, TableName);
 
-        private static AmazonDynamoDBClient InitializeClient()
+        public DynamoDbService(IConfiguration config)
         {
-            string awsAccessKey = "AKIAQ3PJFD2ROS2MYEPT";
-            string awsSecretKey = "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";
+            // Read AWS credentials from environment variables or appsettings.json
+            string accessKey = config["AWS:AccessKey"];
+            string secretKey = config["AWS:SecretKey"];
+            string region = config["AWS:Region"];
 
-            AWSCredentials credentials = new BasicAWSCredentials(awsAccessKey, awsSecretKey);
-            return new AmazonDynamoDBClient(credentials, RegionEndpoint.USEast1);
+            var credentials = new BasicAWSCredentials(accessKey, secretKey);
+            var clientRegion = RegionEndpoint.GetBySystemName(region);
+
+            _client = new AmazonDynamoDBClient(credentials, clientRegion);
+            _context = new DynamoDBContext(_client);
         }
 
         // POST a new SOS alert
         public async Task<string> SendAlert(SosRequest request)
         {
+            var table = Table.LoadTable(_client, TableName);
+
             var sosDoc = new Document
             {
                 ["timestamp"] = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
@@ -46,7 +49,7 @@ namespace Team2_EarthquakeAlertApp.Services
 
             try
             {
-                await SosAlertTable.PutItemAsync(sosDoc);
+                await table.PutItemAsync(sosDoc);
                 return $"Successfully sent alert: {request.problem}";
             }
             catch (Exception ex)
@@ -57,36 +60,30 @@ namespace Team2_EarthquakeAlertApp.Services
 
         public async Task<List<SosRequest>> GetActiveAlerts()
         {
-            using (var context = new DynamoDBContext(DynamoDBClient))
+            var conditions = new List<ScanCondition>
             {
-                var conditions = new List<ScanCondition>
-                {
-                    new ScanCondition("accepted", ScanOperator.Equal, false)
-                };
+                new ScanCondition("accepted", ScanOperator.Equal, false)
+            };
 
-                var search = context.ScanAsync<SosRequest>(conditions);
-
-                return await search.GetRemainingAsync();
-            }
+            var search = _context.ScanAsync<SosRequest>(conditions);
+            return await search.GetRemainingAsync();
         }
 
         public async Task SaveVictimReport(VictimReport report)
         {
-            using var context = new DynamoDBContext(DynamoDBClient);
             report.timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
-            await context.SaveAsync(report);
+            await _context.SaveAsync(report);
         }
 
         public async Task<string> UpdateAlertStatus(string timestamp, string newStatus)
         {
             if (string.IsNullOrEmpty(timestamp))
-            {
                 return "Error: Timestamp cannot be empty.";
-            }
 
             try
             {
                 bool acceptedValue = newStatus.Equals("Accepted", StringComparison.OrdinalIgnoreCase);
+
                 var key = new Dictionary<string, AttributeValue>
                 {
                     { "timestamp", new AttributeValue { S = timestamp } }
@@ -106,13 +103,13 @@ namespace Team2_EarthquakeAlertApp.Services
 
                 var request = new UpdateItemRequest
                 {
-                    TableName = TableName, 
+                    TableName = TableName,
                     Key = key,
                     AttributeUpdates = updates,
                     ReturnValues = "NONE"
                 };
 
-                await DynamoDBClient.UpdateItemAsync(request);
+                await _client.UpdateItemAsync(request);
 
                 return $"Successfully updated alert {timestamp} to accepted-status: {acceptedValue}";
             }
@@ -124,14 +121,13 @@ namespace Team2_EarthquakeAlertApp.Services
 
         public async Task<List<VictimReport>> GetVictimReports()
         {
-            using var context = new DynamoDBContext(DynamoDBClient);
-            var search = context.ScanAsync<VictimReport>(new List<ScanCondition>());
+            var search = _context.ScanAsync<VictimReport>(new List<ScanCondition>());
             return await search.GetRemainingAsync();
         }
+
         public async Task SavePublicAlert(PublicAlert alert)
         {
-            using var context = new DynamoDBContext(DynamoDBClient);
-            await context.SaveAsync(alert);
+            await _context.SaveAsync(alert);
         }
     }
 }

@@ -12,6 +12,10 @@ namespace Team2_EarthquakeAlertApp.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly DynamoDbService _dynamoDbService;
+        private static readonly Random Rand = new();
+        private readonly IWebHostEnvironment _env;
+
         private static readonly List<string> Messages = new()
         {
             "Aftershock detected near downtown area.",
@@ -21,14 +25,10 @@ namespace Team2_EarthquakeAlertApp.Controllers
             "Bridge inspection underway due to quake impact."
         };
 
-        private readonly DynamoDbService _dynamoDbService = new DynamoDbService();
-        private static readonly Random Rand = new();
-
-        private readonly IWebHostEnvironment _env;
-
-        public HomeController(IWebHostEnvironment env)
+        public HomeController(IWebHostEnvironment env, IConfiguration config)
         {
             _env = env;
+            _dynamoDbService = new DynamoDbService(config);
         }
 
 
