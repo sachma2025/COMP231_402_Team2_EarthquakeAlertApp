@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Team2_EarthquakeAlertApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5ee43051642fd609747bca3bbcd4fc14f6a81f51")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0d6f1a8f0c8deef54a55b36840fad99522d39c49")]
 [assembly: System.Reflection.AssemblyProductAttribute("Team2_EarthquakeAlertApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Team2_EarthquakeAlertApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
